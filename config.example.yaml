@@ -1,0 +1,18 @@
+data:
+  start: "2018-01-01"
+  end: "2025-12-31"
+  price_field: "Adj Close"
+
+universe:
+  tickers_csv: "data/tickers.csv"
+
+research:
+  horizons: [1, 5, 10, 20]
+  quantiles: 10
+  winsor_pct: 0.01
+  cost_bps_roundtrip: 20
+  min_history_days: 120
+
+neutralize:
+  use_mktcap: false
+  use_sector: false

@@ -1,0 +1,20 @@
+# data (do not commit)
+data/raw/
+data/processed/
+*.parquet
+
+# results (optional; keep small summaries only)
+results/figs/
+results/*.csv
+
+# local config
+config.yaml
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# mac
+.DS_Store
