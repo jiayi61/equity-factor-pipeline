@@ -1,23 +1,24 @@
-# data (do not commit)
-data/raw/
-data/processed/
-data/tickers.csv
-*.parquet
-
-# results (optional; keep small summaries only)
-results/figs/
-results/*.csv
-!results/ic_summary_sample.csv
-!results/backtest_rev_5_step5_sample.csv
+# local env
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+__MACOSX/
 
 # local config
 config.yaml
 
-# python
-__pycache__/
-*.pyc
-.venv/
-.ipynb_checkpoints/
+# data (do not commit)
+data/
+data/raw/
+data/processed/
+*.parquet
 
-# mac
-.DS_Store
+# keep an example universe, but ignore local universe
+data/tickers.csv
+!data/tickers.example.csv
+
+# results: keep only samples
+results/*.csv
+!results/*_sample.csv
