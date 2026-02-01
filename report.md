@@ -40,6 +40,21 @@ Backtest file: `results/backtest_rev_5_step5.csv`
 - **max_drawdown:** -29.36%
 - **avg_turnover_per_rebalance:** 1.58
 
+### Cost sensitivity (round-trip bps)
+
+Using the same gross 5-day returns and realized turnover, we recompute net performance under different round-trip cost assumptions:
+
+| Cost (bps, round-trip) | Ann. Return | Ann. Vol | Sharpe | MaxDD |
+|---:|---:|---:|---:|---:|
+| 0  | 35.50% | 25.87% | 1.37 | -17.84% |
+| 10 | 25.18% | 25.87% | 0.97 | -20.10% |
+| 20 | 15.63% | 25.87% | 0.60 | -29.36% |
+| 50 | -8.93% | 25.89% | -0.34 | -68.96% |
+| 100 | -38.98% | 25.93% | -1.50 | -97.96% |
+
+Takeaway: performance degrades quickly as costs rise; the strategy is viable only under relatively low all-in costs (≈20 bps or below), motivating further turnover reduction and execution-aware modeling.
+
+
 ## Limitations
 - Yahoo Finance data limitations (symbol mapping, survivorship/delistings depending on availability).
 - Simplified transaction costs (constant bps); no explicit slippage/market impact modeling.

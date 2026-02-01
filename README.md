@@ -1,4 +1,3 @@
-
 # Equity Factor Research Pipeline (Demo)
 
 A reproducible **cross-sectional equity factor research pipeline**:
@@ -19,8 +18,8 @@ This repo is intentionally portfolio-quality: clear assumptions, reproducible sc
 - **Universe / sample:** 130 tech-tilted US equities × 1,870 trading days; **q=5**
 - **Costs:** constant **20 bps** round-trip × turnover
 - **Signal (rev_5):** positive RankIC across horizons (see `results/ic_summary_sample.csv`)
-- **Aligned backtest (step=5d, uses `fwd_ret_5d`):** **Sharpe 0.60**, **AnnRet 15.63%**, **MaxDD -29.36%** (cost-adjusted, 20 bps)
-- **Cost sensitivity:** Sharpe drops rapidly; performance flips negative around **50 bps** (see `results/cost_sensitivity_rev_5_step5_sample.csv`)
+- **Aligned backtest (step=5d, uses `fwd_ret_5d`):** **Sharpe 0.60**, **AnnRet 15.63%**, **Max Drawdown -29.36%** (cost-adjusted, 20 bps)
+- **Cost sensitivity:** Sharpe drops rapidly; performance flips negative at **50 bps** (see `results/cost_sensitivity_rev_5_step5_sample.csv`)
 
 ![Equity curve](assets/equity_rev_5_step5.png)
 ![Drawdown](assets/drawdown_rev_5_step5.png)
@@ -28,28 +27,35 @@ This repo is intentionally portfolio-quality: clear assumptions, reproducible sc
 
 > Configuration is controlled via `config.yaml` (local, not committed). See `config.example.yaml` for defaults.
 
-
-
 ## Repo structure (actual)
 ```text
 equity-factor-pipeline/
 ├── scripts/
-│   ├── 00_download.py                 # Download OHLCV into data/raw/
-│   ├── 01_build_panel.py              # Build aligned panel + forward-return labels
-│   ├── 02_preprocess.py               # Factors + winsorize/zscore -> panel_factors.parquet
-│   ├── 03_evaluate.py                 # IC/RankIC, decay, quantile spread -> results/*.csv
-│   └── 04_backtest.py                 # Backtests (daily or step=5d) -> results/backtest_*.csv
+│   ├── 00_download.py                  # Download OHLCV into data/raw/
+│   ├── 01_build_panel.py               # Build aligned panel + forward-return labels
+│   ├── 02_preprocess.py                # Factors + winsorize/zscore -> panel_factors.parquet
+│   ├── 03_evaluate.py                  # IC/RankIC, decay, quantile spread -> results/*.csv
+│   ├── 04_backtest.py                  # Backtests (daily or step=5d) -> results/backtest_*.csv
+│   └── 05_plot.py                      # Save figures under assets/
+├── assets/
+│   ├── equity_rev_5_step5.png
+│   ├── drawdown_rev_5_step5.png
+│   └── cost_sensitivity_sharpe.png
 ├── data/
-│   ├── .gitkeep                       # Keep folder in repo (no data committed)
-│   └── tickers.csv                    # Local universe list (typically NOT committed)
+│   ├── .gitkeep                        # Keep folder in repo (no data committed)
+│   ├── tickers.example.csv             # Universe template (committed)
+│   ├── tickers.csv                     # Local universe list (not committed)
+│   ├── raw/                            # Generated locally (not committed)
+│   └── processed/                      # Generated locally (not committed)
 ├── results/
-│   ├── ic_summary_sample.csv          # Small sample output (committed)
-│   └── backtest_rev_5_step5_sample.csv# Small sample output (committed)
-├── config.example.yaml                # Config template (committed)
-├── config.yaml                        # Local config (NOT committed)
-├── requirements.txt                   # Dependencies (committed)
-├── report.md                          # 1-page write-up (committed)
-├── .gitignore                         # Ignore local data/config, keep samples (committed)
+│   ├── ic_summary_sample.csv           # Small sample output (committed)
+│   ├── backtest_rev_5_step5_sample.csv # Small sample output (committed)
+│   └── cost_sensitivity_rev_5_step5_sample.csv # Small sample output (committed)
+├── config.example.yaml                 # Config template (committed)
+├── config.yaml                         # Local config (NOT committed)
+├── requirements.txt                    # Dependencies (committed)
+├── report.md                           # 1-page write-up (committed)
+├── .gitignore                          # Ignore local data/config, keep samples (committed)
 └── README.md
 ```
 
@@ -70,14 +76,10 @@ pip install pyarrow
 ### 3) Prepare config + tickers
 ```bash
 cp config.example.yaml config.yaml
-
-# Create your local universe (one column: ticker)
-# Example:
-echo "ticker
-AAPL
-MSFT
-NVDA" > data/tickers.csv
+cp data/tickers.example.csv data/tickers.csv
 ```
+
+> Some tickers may fail to download (symbol mapping/delistings); the pipeline skips empty downloads and continues.
 
 ### 4) Run the pipeline (00 → 04)
 ```bash
@@ -86,6 +88,11 @@ python scripts/01_build_panel.py
 python scripts/02_preprocess.py
 python scripts/03_evaluate.py
 python scripts/04_backtest.py
+```
+
+### 5) Generate figures
+```bash
+python scripts/05_plot.py
 ```
 
 ## Outputs
@@ -106,11 +113,12 @@ python scripts/04_backtest.py
 ### Committed samples (for preview)
 - `results/ic_summary_sample.csv`
 - `results/backtest_rev_5_step5_sample.csv`
+- `results/cost_sensitivity_rev_5_step5_sample.csv`
 
 ## Important notes
-- Raw/processed data and most result CSVs are ignored by git by design.
+- Raw/processed datasets are generated locally and are **not committed**; the repo ships only small `*_sample.csv` outputs and plots under `assets/`.
 - For reliable cross-sectional statistics, use **N ≥ 100** tickers and **q = 5**.
-- A positive IC does not guarantee profitability under daily rebalancing due to horizon mismatch and costs; this repo includes a **step=5d** backtest to align evaluation targets.
+- A positive IC does not guarantee profitability under daily rebalancing due to horizon mismatch and costs; this repo includes a **step=5d** backtest aligned to `fwd_ret_5d`.
 
 ## Report
 See `report.md` for assumptions, key results, limitations, and next steps.
