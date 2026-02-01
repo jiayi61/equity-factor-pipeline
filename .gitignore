@@ -9,6 +9,8 @@ results/figs/
 results/*.csv
 results/*.csv
 !results/ic_summary_sample.csv
+!results/backtest_vol_20_sample.csv
+
 
 # local config
 config.yaml

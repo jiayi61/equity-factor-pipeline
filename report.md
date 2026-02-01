@@ -1,53 +1,52 @@
-# Equity Factor Research — Demo Report (Yahoo Finance)
+# Equity Factor Research — Tech-Tilted US Universe (Yahoo Finance)
 
 ## Research setup
-- **Universe:** 10 US large-cap tickers (toy universe for pipeline validation)
-- **Data:** daily OHLCV from Yahoo Finance (`yfinance`)
-- **Sample period:** ~1870 trading days (see `data/processed/panel.parquet`)
+- **Universe:** 130 US equities (tech-tilted), daily data from Yahoo Finance (`yfinance`)
+- **Sample period:** 1870 trading days (panel coverage after filters)
 - **Prediction horizons (labels):** 1/5/10/20 trading days forward returns
 - **Cross-sectional preprocessing:** winsorize (1%) + z-score per day
-- **Portfolio formation:** daily rebalanced long–short **top vs bottom quantile** (q = <Q>)
-- **Transaction cost model:** constant **round-trip <COST_BPS> bps** (see `config.yaml`)
-- **Reproducibility:** run `scripts/00_download.py → 01_build_panel.py → 02_preprocess.py → 03_evaluate.py → 04_backtest.py`
+- **Quantile formation:** q = 5 (top vs bottom)
+- **Transaction cost model:** constant round-trip 20 bps × turnover
+- **Reproducibility:** `00_download → 01_build_panel → 02_preprocess → 03_evaluate → 04_backtest`
 
-## Factor definition (example)
-**vol_20**: 20-day rolling volatility of daily returns  
+## Factor definition (main)
+**rev_5** (short-term reversal):
 \[
-vol_{20}(i,t) = \mathrm{Std}(\mathrm{ret}_{1d}(i,t-19:t))
+rev\_5(i,t) = -\left(\frac{P_{t}}{P_{t-5}} - 1\right)
 \]
+Intuition: recent winners tend to mean-revert over short horizons (especially in high-beta tech).
 
-## Factor validation
-Outputs saved in:
-- `results/ic_summary.csv` — IC / RankIC mean, IR, t-stat by horizon
-- `results/decay_curve.csv` — RankIC vs horizon (decay)
-- `results/quantile_spread.csv` — top-minus-bottom forward return spread
+## Factor validation (IC / RankIC)
+From `results/ic_summary.csv` (N≈130 per day, n_days=1870):
+- **H=20:** RankIC_mean ≈ 0.0219, RankIC_IR ≈ 0.115, t ≈ 4.99  
+- **H=10:** RankIC_IR ≈ 0.101, t ≈ 4.39  
+- **H=5:**  RankIC_IR ≈ 0.124, t ≈ 5.36  
 
-Notes:
-- With a **toy universe (N=10)**, IC estimates are noisy and mainly used to validate the end-to-end pipeline.
-- Next step is to expand universe to 100–300 liquid tickers to obtain stable cross-sectional statistics.
+Interpretation: `rev_5` shows stable positive predictive power across multiple horizons.
 
-## Backtest (long–short top/bottom, cost-adjusted)
-Backtest file: `results/backtest_vol_20.csv`
+## Backtest design (aligned to horizon)
+To avoid horizon mismatch (IC on H-day forward returns vs daily PnL), we run a **5-day step backtest**:
+- **Rebalance every 5 trading days**
+- **Portfolio return uses `fwd_ret_5d`** on rebalance dates (aligned with validation target)
+- Costs charged on rebalance dates only: bps × turnover
 
-Summary (cost-adjusted):
-- **n_days:** 1870
-- **ann_ret:** 8.156%
-- **ann_vol:** 67.432%
-- **Sharpe:** 0.12
-- **max_drawdown:** -91.22%
-- **avg_turnover:** 0.192
+Backtest file: `results/backtest_rev_5_step5.csv`
 
-Interpretation:
-- The factor is **not profitable** under this simple long–short formulation on the toy universe.
-- The large drawdown is consistent with **small-universe concentration + simplistic long/short construction**; this is treated as a diagnostic outcome, not a production result.
+### Backtest summary (cost-adjusted)
+- **n_steps:** 374 (≈ 1870 / 5)
+- **ann_ret:** 15.635%
+- **ann_vol:** 25.874%
+- **Sharpe:** 0.60
+- **max_drawdown:** -29.36%
+- **avg_turnover_per_rebalance:** 1.58
 
 ## Limitations
-- **Small universe (N=10)** → unstable IC/quantile tests and concentrated portfolios.
-- Yahoo Finance data limitations (e.g., delistings/survivorship).
-- Simplified transaction costs (constant bps) and no slippage/market impact.
+- Yahoo Finance data limitations (symbol mapping, survivorship/delistings depending on availability).
+- Simplified transaction costs (constant bps); no explicit slippage/market impact modeling.
+- No sector/size/beta neutralization yet.
 
-## Next steps (to make this “real”)
-1. Expand tickers to 100–300 (or use a standard index universe).
-2. Set `quantiles=5` and re-run evaluation/backtest.
-3. Add walk-forward OOS: tune parameters on train window, evaluate on holdout.
-4. Add risk controls / neutralization (market beta, sector, size).
+## Next steps
+1. Add risk controls: beta neutralization, sector neutrality, volatility targeting, position limits.
+2. Cost sensitivity: test multiple bps levels + slippage proxy.
+3. Walk-forward OOS: tune/lookback choices on train window, evaluate on holdout.
+4. Extend factor library (fundamentals/news optional) and test interactions/ensembles.
