@@ -1,11 +1,14 @@
 # data (do not commit)
 data/raw/
 data/processed/
+data/tickers.csv
 *.parquet
 
 # results (optional; keep small summaries only)
 results/figs/
 results/*.csv
+results/*.csv
+!results/ic_summary_sample.csv
 
 # local config
 config.yaml
