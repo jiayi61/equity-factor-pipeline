@@ -92,3 +92,10 @@ See report.md for assumptions, evaluation outputs, and backtest results.
 ## License
 MIT
 <img width="468" height="637" alt="image" src="https://github.com/user-attachments/assets/4a11cbd9-ddbf-41c3-9e85-3d91d88bc799" />
+<<<<<<< HEAD
+=======
+
+## Report
+See `report.md` and sample outputs in `results/*_sample.csv`.
+
+>>>>>>> 374f960 (chore: consolidate pipeline scripts and docs)

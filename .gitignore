@@ -7,10 +7,8 @@ data/tickers.csv
 # results (optional; keep small summaries only)
 results/figs/
 results/*.csv
-results/*.csv
 !results/ic_summary_sample.csv
-!results/backtest_vol_20_sample.csv
-
+!results/backtest_rev_5_step5_sample.csv
 
 # local config
 config.yaml
