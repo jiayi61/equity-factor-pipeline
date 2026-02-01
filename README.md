@@ -15,13 +15,20 @@ This repo is intentionally portfolio-quality: clear assumptions, reproducible sc
 - Evaluates signals via **IC / RankIC**, horizon decay, and quantile spread tests
 - Runs cost-aware long/short backtests, including a **5-day step backtest aligned to `fwd_ret_5d`**
 
-## Current demo configuration (reproducible)
-- **Universe:** 130 tech-tilted US equities
-- **Sample:** 1,870 trading days
-- **Quantiles:** q = 5 (top vs bottom)
-- **Transaction costs:** constant **20 bps round-trip** × turnover (see `config.yaml`)
+## Results snapshot (current demo)
+- **Universe / sample:** 130 tech-tilted US equities × 1,870 trading days; **q=5**
+- **Costs:** constant **20 bps** round-trip × turnover
+- **Signal (rev_5):** positive RankIC across horizons (see `results/ic_summary_sample.csv`)
+- **Aligned backtest (step=5d, uses `fwd_ret_5d`):** **Sharpe 0.60**, **AnnRet 15.63%**, **MaxDD -29.36%** (cost-adjusted, 20 bps)
+- **Cost sensitivity:** Sharpe drops rapidly; performance flips negative around **50 bps** (see `results/cost_sensitivity_rev_5_step5_sample.csv`)
 
-> Note: results depend on the ticker universe and cost assumptions. This repo prioritizes research workflow correctness over “best performance”.
+![Equity curve](assets/equity_rev_5_step5.png)
+![Drawdown](assets/drawdown_rev_5_step5.png)
+![Cost sensitivity (Sharpe vs bps)](assets/cost_sensitivity_sharpe.png)
+
+> Configuration is controlled via `config.yaml` (local, not committed). See `config.example.yaml` for defaults.
+
+
 
 ## Repo structure (actual)
 ```text

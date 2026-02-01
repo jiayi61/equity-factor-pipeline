@@ -1,25 +1,18 @@
-# local env
-.venv/
-__pycache__/
-*.pyc
-.ipynb_checkpoints/
-.DS_Store
-__MACOSX/
-
 # local config
 config.yaml
 
-# data (do not commit)
-data/
-!data/.gitkeep
+# data artifacts (do not commit)
 data/raw/
 data/processed/
 *.parquet
 
-# keep an example universe, but ignore local universe
+# universe: commit example, ignore local
 data/tickers.csv
 !data/tickers.example.csv
 
-# results: keep only samples
+# keep folder
+!data/.gitkeep
+
+# results: keep samples only
 results/*.csv
 !results/*_sample.csv
