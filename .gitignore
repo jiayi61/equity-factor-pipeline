@@ -11,6 +11,7 @@ config.yaml
 
 # data (do not commit)
 data/
+!data/.gitkeep
 data/raw/
 data/processed/
 *.parquet
