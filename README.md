@@ -15,16 +15,31 @@ and reproducible outputs.
 - Runs a simple daily-rebalanced long/short top-bottom backtest with a constant bps cost model
 
 ## Repo structure
-scripts/
-  00_download.py        # download per-ticker data to data/raw/
-  01_build_panel.py     # build aligned panel + forward-return labels
-  02_preprocess.py      # compute factors + winsorize/zscore; saves panel_factors.parquet
-  03_evaluate.py        # IC/RankIC, decay, quantile spread; writes results/*.csv
-  04_backtest.py        # long-short backtest with costs; writes results/backtest_*.csv
-data/
-  tickers.csv           # local universe list
-results/                # evaluation tables and backtest outputs (usually not committed)
-report.md               # 1-page demo report
+
+<pre> 
+equity-factor-pipeline/ 
+├── Config/ 
+│   ├── config.example.yaml # Config template (COMMIT) 
+│   └── config.yaml # Local config (DO NOT COMMIT) 
+├── Data/ 
+│   ├── Raw/ # Per-ticker OHLCV downloads (DO NOT COMMIT) 
+│   └── Processed/ # Aligned panels + factor tables (DO NOT COMMIT) 
+├── Scripts/ # Deterministic pipeline entrypoints (00→04)
+│   ├── 00_download.py # Download raw OHLCV into Data/Raw/ 
+│   ├── 01_build_panel.py # Build aligned panel + forward-return labels 
+│   ├── 02_preprocess.py # Build factors + winsorize/zscore; saves factor panel 
+│   ├── 03_evaluate.py # IC/RankIC, decay, quantile spread; writes Outputs/Tables 
+│   └── 04_backtest.py # Long-short backtest w/ costs; writes Outputs/Tables 
+├── Outputs/ 
+│   ├── Figures/ # Plots (IC time series, decay curve, equity curve)
+│   └── Tables/ # CSV summaries (ic_summary, decay_curve, backtest_*.csv) 
+├── Docs/ 
+│   └── report.md # 1-page report: setup → results → limitations → next steps 
+├── requirements.txt # Python deps (COMMIT)
+├── .gitignore # Ignore Data/Raw, Data/Processed, local config, etc. (COMMIT)
+└── README.md # Project overview + how to run + outputs 
+</pre>
+
 
 ## Quickstart (macOS / zsh)
 ### 1) Create and activate a virtual environment
